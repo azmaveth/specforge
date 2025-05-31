@@ -61,7 +61,7 @@ defmodule SpecforgeCore.Impl.TaskPlannerImpl do
   defp maybe_validate(task_description, _options), do: validate_task(task_description)
 
   defp generate_plan(task_description, options) do
-    model = Map.get(options, :model, Application.get_env(:specforge_core, :default_model, "openai:gpt-4"))
+    model = Map.get(options, :model, Application.get_env(:specforge_core, :default_model, "openai"))
     
     prompt = build_task_planning_prompt(task_description, options)
     

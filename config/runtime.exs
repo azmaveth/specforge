@@ -24,7 +24,7 @@ config :specforge_core,
   cache_ttl: String.to_integer(System.get_env("CACHE_TTL", "3600")),
   cache_max_size: String.to_integer(System.get_env("CACHE_MAX_SIZE", "100")),
   output_dir: System.get_env("OUTPUT_DIR", "./specs"),
-  default_model: System.get_env("DEFAULT_MODEL", "openai:gpt-4"),
+  default_model: System.get_env("DEFAULT_MODEL", "openai"),
   enable_web_search: System.get_env("ENABLE_WEB_SEARCH", "false") == "true"
 
 # LLM configuration

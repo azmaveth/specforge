@@ -73,7 +73,7 @@ config :swoosh, :api_client, false
 
 # SpecForge Core configuration
 config :specforge_core,
-  default_model: "openai:gpt-4",
+  default_model: "openai",
   output_dir: "./specs",
   cache_ttl: 3600,
   enable_web_search: false

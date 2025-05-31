@@ -102,21 +102,24 @@ SpecForge supports multiple LLM providers through environment variables:
 
 ```bash
 OPENAI_API_KEY=sk-your-key-here
-DEFAULT_MODEL=openai:gpt-4
+DEFAULT_MODEL=openai              # Uses provider's default (gpt-4-turbo)
+# DEFAULT_MODEL=openai:gpt-4o     # Or specify a specific model
 ```
 
 ### Anthropic Claude
 
 ```bash
 ANTHROPIC_API_KEY=your-key-here
-DEFAULT_MODEL=anthropic:claude-3-sonnet
+DEFAULT_MODEL=anthropic           # Uses provider's default (claude-3-5-sonnet)
+# DEFAULT_MODEL=anthropic:claude-3-opus-20240229
 ```
 
 ### Local Ollama
 
 ```bash
 OLLAMA_HOST=http://localhost:11434
-DEFAULT_MODEL=ollama:llama2
+DEFAULT_MODEL=ollama              # Uses first available model
+# DEFAULT_MODEL=ollama:llama3.3   # Or specify a specific model
 ```
 
 ### Caching & Output
