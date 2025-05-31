@@ -1,0 +1,55 @@
+# Dependencies
+/deps/
+/doc/
+/.fetch
+
+# Build artifacts
+/_build/
+/cover/
+/tmp/
+
+# Static artifacts
+/node_modules/
+/assets/node_modules/
+
+# Secrets
+.env
+.env.*
+
+# Version control
+.git/
+.gitignore
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+/test/
+/spec/
+
+# Documentation
+*.md
+/docs/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Development tools
+.credo.exs
+.dialyzer_ignore.exs
+.formatter.exs
+
+# Logs
+*.log
+npm-debug.log*
+
+# Crash dumps
+erl_crash.dump

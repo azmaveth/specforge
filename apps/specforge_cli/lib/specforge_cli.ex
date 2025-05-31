@@ -14,7 +14,7 @@ defmodule SpecforgeCli do
     |> run_command()
   rescue
     e ->
-      Owl.IO.puts([:red, "Error: #{Exception.message(e)}"])
+      IO.puts(:stderr, "Error: #{Exception.message(e)}")
       :erlang.halt(1)
   end
 
@@ -53,7 +53,7 @@ defmodule SpecforgeCli do
           "plan" -> Plan.run(args, opts)
           "help" -> show_help(List.first(args))
           _ -> 
-            Owl.IO.puts([:red, "Unknown command: #{cmd}"])
+            IO.puts(:stderr, "Unknown command: #{cmd}")
             show_help()
             :erlang.halt(1)
         end
@@ -61,7 +61,7 @@ defmodule SpecforgeCli do
   end
 
   defp show_version do
-    Owl.IO.puts([:green, "SpecForge v#{@version}"])
+    IO.puts("SpecForge v#{@version}")
   end
 
   defp show_help(nil), do: show_help()
@@ -71,25 +71,26 @@ defmodule SpecforgeCli do
   defp show_help(_), do: show_help()
 
   defp show_help do
-    Owl.IO.puts([
-      [:bright, "SpecForge"],
-      " - Next-Generation Task & Design Spec Assistant\n\n",
-      [:yellow, "Usage:"],
-      "\n  spec <command> [options]\n\n",
-      [:yellow, "Commands:"],
-      "\n  ",
-      [:cyan, "task"], "    Analyze a task and generate an actionable plan\n  ",
-      [:cyan, "system"], "  Create or refine a system design\n  ",
-      [:cyan, "plan"], "    Convert a system design into implementation tasks\n\n",
-      [:yellow, "Global Options:"],
-      "\n  ",
-      [:cyan, "-h, --help"], "     Show help\n  ",
-      [:cyan, "-v, --version"], "  Show version\n  ",
-      [:cyan, "-q, --quiet"], "    Suppress output\n  ",
-      [:cyan, "--verbose"], "      Show detailed output\n  ",
-      [:cyan, "--cache"], "        Enable caching (mem|disk)\n  ",
-      [:cyan, "--output-dir"], "   Set output directory\n\n",
-      "Run 'spec <command> --help' for command-specific options.\n"
-    ])
+    IO.puts("""
+    SpecForge - Next-Generation Task & Design Spec Assistant
+
+    Usage:
+      spec <command> [options]
+
+    Commands:
+      task    Analyze a task and generate an actionable plan
+      system  Create or refine a system design
+      plan    Convert a system design into implementation tasks
+
+    Global Options:
+      -h, --help     Show help
+      -v, --version  Show version
+      -q, --quiet    Suppress output
+      --verbose      Show detailed output
+      --cache        Enable caching (mem|disk)
+      --output-dir   Set output directory
+
+    Run 'spec <command> --help' for command-specific options.
+    """)
   end
 end

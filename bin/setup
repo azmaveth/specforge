@@ -1,0 +1,174 @@
+#!/usr/bin/env bash
+#
+# Setup script for SpecForge development environment
+# This script checks prerequisites and sets up the project for development
+
+set -euo pipefail
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_ROOT="$( cd "${SCRIPT_DIR}/.." && pwd )"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Helper functions
+info() {
+  echo -e "${BLUE}==>${NC} $1"
+}
+
+success() {
+  echo -e "${GREEN}✓${NC} $1"
+}
+
+warning() {
+  echo -e "${YELLOW}⚠${NC} $1"
+}
+
+error() {
+  echo -e "${RED}✗${NC} $1"
+  exit 1
+}
+
+check_command() {
+  if command -v "$1" >/dev/null 2>&1; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# Check prerequisites
+info "Checking prerequisites..."
+
+# Check Elixir
+if check_command elixir; then
+  ELIXIR_VERSION=$(elixir --version | grep "Elixir" | cut -d' ' -f2)
+  success "Elixir ${ELIXIR_VERSION} found"
+  
+  # Check minimum version (1.17)
+  REQUIRED_VERSION="1.17"
+  if [ "$(printf '%s\n' "$REQUIRED_VERSION" "$ELIXIR_VERSION" | sort -V | head -n1)" != "$REQUIRED_VERSION" ]; then
+    error "Elixir version $REQUIRED_VERSION or higher is required (found $ELIXIR_VERSION)"
+  fi
+else
+  error "Elixir not found. Please install Elixir >= 1.17"
+fi
+
+# Check Erlang/OTP
+if check_command erl; then
+  OTP_VERSION=$(erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().' -noshell | tr -d '"')
+  success "Erlang/OTP ${OTP_VERSION} found"
+else
+  error "Erlang/OTP not found. Please install Erlang/OTP"
+fi
+
+# Check Node.js (for Phoenix assets)
+if check_command node; then
+  NODE_VERSION=$(node --version)
+  success "Node.js ${NODE_VERSION} found"
+else
+  warning "Node.js not found. Install Node.js >= 20 for Phoenix asset compilation"
+fi
+
+# Check if asdf is being used
+if [ -f "${PROJECT_ROOT}/.tool-versions" ] && check_command asdf; then
+  info "asdf detected, installing versions from .tool-versions..."
+  cd "${PROJECT_ROOT}"
+  asdf install
+fi
+
+# Install Hex and Rebar
+info "Installing/updating Hex and Rebar..."
+mix local.hex --force
+mix local.rebar --force
+
+# Install Phoenix installer
+info "Installing/updating Phoenix installer..."
+mix archive.install hex phx_new --force
+
+# Get dependencies
+info "Fetching dependencies..."
+cd "${PROJECT_ROOT}"
+mix deps.get --all
+
+# Compile dependencies
+info "Compiling dependencies..."
+mix deps.compile
+
+# Setup Phoenix assets
+if [ -d "${PROJECT_ROOT}/apps/specforge_web/assets" ]; then
+  info "Setting up Phoenix assets..."
+  cd "${PROJECT_ROOT}/apps/specforge_web"
+  
+  if check_command npm; then
+    cd assets && npm install
+    success "Phoenix assets installed"
+  else
+    warning "npm not found, skipping Phoenix asset installation"
+  fi
+fi
+
+# Create .env file if it doesn't exist
+if [ ! -f "${PROJECT_ROOT}/.env" ]; then
+  info "Creating .env file from template..."
+  cat > "${PROJECT_ROOT}/.env" << 'EOF'
+# SpecForge Environment Variables
+# Copy this file to .env and update with your values
+
+# LLM Configuration
+# Example: OPENAI_API_KEY=sk-...
+# Example: ANTHROPIC_API_KEY=sk-ant-...
+
+# Default LLM Model
+# Example: DEFAULT_MODEL=openai:gpt-4o
+# Example: DEFAULT_MODEL=anthropic:claude-3-opus-20240229
+
+# Cache Configuration
+CACHE_BACKEND=mem  # Options: mem, disk
+CACHE_TTL=3600    # Cache time-to-live in seconds
+
+# Output Configuration
+OUTPUT_DIR=./specs
+
+# Phoenix Configuration (for development)
+PHX_HOST=localhost
+PHX_PORT=4000
+EOF
+  success ".env file created (update with your API keys)"
+else
+  success ".env file already exists"
+fi
+
+# Run initial compilation
+info "Running initial compilation..."
+cd "${PROJECT_ROOT}"
+mix compile
+
+# Setup database (if needed in future)
+# info "Setting up database..."
+# mix ecto.setup
+
+# Run tests
+info "Running tests..."
+mix test || warning "Some tests failed (this is expected for initial setup)"
+
+# Build escript
+info "Building CLI executable..."
+cd "${PROJECT_ROOT}/apps/specforge_cli"
+mix escript.build || warning "Escript build failed (this is expected if there are compilation issues)"
+
+# Final message
+echo ""
+success "Setup complete! 🎉"
+echo ""
+echo "Next steps:"
+echo "  1. Update .env with your LLM API keys"
+echo "  2. Run 'mix test' to ensure everything is working"
+echo "  3. Run 'cd apps/specforge_web && mix phx.server' to start the web server"
+echo "  4. Run './spec --help' to see CLI usage (after building escript)"
+echo ""
+echo "For more information, see README.md and docs/SPECFORGE.md"

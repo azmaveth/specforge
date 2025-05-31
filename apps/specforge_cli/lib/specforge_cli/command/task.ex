@@ -18,25 +18,26 @@ defmodule SpecforgeCli.Command.Task do
   end
 
   def help do
-    Owl.IO.puts([
-      [:bright, "spec task"],
-      " - Analyze a task and generate an actionable plan\n\n",
-      [:yellow, "Usage:"],
-      "\n  spec task <task-description> [options]",
-      "\n  spec task - [options]                    # Read from stdin\n\n",
-      [:yellow, "Options:"],
-      "\n  ",
-      [:cyan, "--from <file>"], "       Read task from file\n  ",
-      [:cyan, "--to <file|dir>"], "     Write output to file or directory\n  ",
-      [:cyan, "--model <model>"], "     LLM model (e.g., openai:gpt-4o)\n  ",
-      [:cyan, "--search"], "            Augment with web context\n  ",
-      [:cyan, "--template <file>"], "   Custom template file\n  ",
-      [:cyan, "--no-validate"], "       Skip validation\n\n",
-      [:yellow, "Examples:"],
-      "\n  spec task \"Implement user authentication\"\n  ",
-      "spec task --from requirements.txt --to specs/\n  ",
-      "echo \"Build a REST API\" | spec task -\n"
-    ])
+    IO.puts("""
+    spec task - Analyze a task and generate an actionable plan
+
+    Usage:
+      spec task <task-description> [options]
+      spec task - [options]                    # Read from stdin
+
+    Options:
+      --from <file>       Read task from file
+      --to <file|dir>     Write output to file or directory
+      --model <model>     LLM model (e.g., openai:gpt-4o)
+      --search            Augment with web context
+      --template <file>   Custom template file
+      --no-validate       Skip validation
+
+    Examples:
+      spec task "Implement user authentication"
+      spec task --from requirements.txt --to specs/
+      echo "Build a REST API" | spec task -
+    """)
   end
 
   defp parse_options(args) do
@@ -105,7 +106,7 @@ defmodule SpecforgeCli.Command.Task do
     case File.write(output_path, result) do
       :ok -> 
         unless opts[:quiet] do
-          Owl.IO.puts([:green, "✓ Output written to: #{output_path}"])
+          IO.puts("✓ Output written to: #{output_path}")
         end
       {:error, reason} ->
         raise "Failed to write output: #{reason}"
@@ -113,20 +114,20 @@ defmodule SpecforgeCli.Command.Task do
   end
 
   defp handle_output(result, _opts) do
-    Owl.IO.puts(result)
+    IO.puts(result)
   end
 
   defp with_progress(message, fun) do
     # Simplified progress indicator for now
-    Owl.IO.puts([:cyan, "⏳ #{message}"])
+    IO.puts("⏳ #{message}")
     
     try do
       result = fun.()
-      Owl.IO.puts([:green, "✓ Done!"])
+      IO.puts("✓ Done!")
       result
     rescue
       e ->
-        Owl.IO.puts([:red, "✗ Failed!"])
+        IO.puts("✗ Failed!")
         reraise e, __STACKTRACE__
     end
   end

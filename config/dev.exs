@@ -70,3 +70,10 @@ config :phoenix_live_view, :debug_heex_annotations, true
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+# SpecForge Core configuration
+config :specforge_core,
+  default_model: "openai:gpt-4",
+  output_dir: "./specs",
+  cache_ttl: 3600,
+  enable_web_search: false

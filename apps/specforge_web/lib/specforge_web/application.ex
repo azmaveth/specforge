@@ -7,14 +7,17 @@ defmodule SpecForgeWeb.Application do
 
   @impl true
   def start(_type, _args) do
+    # Create ETS table for job tracking
+    :ets.new(:specforge_jobs, [:set, :public, :named_table])
+    
     children = [
       SpecForgeWebWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:specforge_web, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: SpecForgeWeb.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: SpecForgeWeb.Finch},
-      # Start a worker by calling: SpecForgeWeb.Worker.start_link(arg)
-      # {SpecForgeWeb.Worker, arg},
+      # Task supervisor for async job processing
+      {Task.Supervisor, name: SpecForgeWeb.TaskSupervisor},
       # Start to serve requests, typically the last entry
       SpecForgeWebWeb.Endpoint
     ]

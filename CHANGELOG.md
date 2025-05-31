@@ -33,7 +33,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Dialyxir for static type checking
   - Sobelow for security scanning
   - ExDoc for documentation generation
+  - Mox for creating test mocks
+  - StreamData for property-based testing
+- Phoenix API implementation:
+  - RESTful API controllers for task, system, and plan operations
+  - Async job processing with ETS-based job tracking
+  - Status endpoint for job monitoring
+  - Fallback controller for error handling
+- Test infrastructure:
+  - ExUnit test setup with Mox mocks
+  - Property-based tests using StreamData
+  - Test case base module with helpers
+  - Unit tests for TaskPlannerImpl
+- Developer setup script (bin/setup) with:
+  - Prerequisite checking
+  - Dependency installation
+  - Environment file creation
+  - Asset compilation support
 - Basic project documentation (README.md, CLAUDE.md, TASKS.md)
+- CI/CD configuration:
+  - GitHub Actions workflow for testing across Elixir/OTP versions
+  - Automated release workflow with binary artifacts
+  - Docker build and push automation
+  - Credo and Sobelow integration in CI
+- Docker support:
+  - Multi-stage Dockerfile for optimized images
+  - .dockerignore for efficient builds
+- Environment configuration:
+  - Comprehensive .env.example file
+  - Support for multiple LLM providers
+  - Configurable cache and output settings
 
 ### Changed
 - Moved design documents to `docs/` folder

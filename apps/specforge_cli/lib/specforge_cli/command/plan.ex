@@ -17,23 +17,24 @@ defmodule SpecforgeCli.Command.Plan do
   end
 
   def help do
-    Owl.IO.puts([
-      [:bright, "spec plan"],
-      " - Convert a system design into implementation tasks\n\n",
-      [:yellow, "Usage:"],
-      "\n  spec plan --from <design.md> [options]\n\n",
-      [:yellow, "Options:"],
-      "\n  ",
-      [:cyan, "--from <file>"], "       Design document (required)\n  ",
-      [:cyan, "--to <file|dir>"], "     Output location\n  ",
-      [:cyan, "--model <model>"], "     LLM model override\n  ",
-      [:cyan, "--format <format>"], "   Output format (md|json|yaml)\n  ",
-      [:cyan, "--slice"], "             Slice into phase files\n  ",
-      [:cyan, "--dir <dir>"], "         Output directory for slices\n\n",
-      [:yellow, "Examples:"],
-      "\n  spec plan --from design.md\n  ",
-      "spec plan --from design.md --slice --dir phases/\n"
-    ])
+    IO.puts("""
+    spec plan - Convert a system design into implementation tasks
+
+    Usage:
+      spec plan --from <design.md> [options]
+
+    Options:
+      --from <file>       Design document (required)
+      --to <file|dir>     Output location
+      --model <model>     LLM model override
+      --format <format>   Output format (md|json|yaml)
+      --slice             Slice into phase files
+      --dir <dir>         Output directory for slices
+
+    Examples:
+      spec plan --from design.md
+      spec plan --from design.md --slice --dir phases/
+    """)
   end
 
   defp parse_options(args) do
@@ -61,13 +62,13 @@ defmodule SpecforgeCli.Command.Plan do
   defp execute_plan(opts) do
     # Stub implementation
     if opts[:from] do
-      Owl.IO.puts([:yellow, "Plan generation from #{opts[:from]} not yet implemented."])
+      IO.puts("Plan generation from #{opts[:from]} not yet implemented.")
       
       if opts[:slice] do
-        Owl.IO.puts("Would slice output into directory: #{opts[:dir] || "./"}")
+        IO.puts("Would slice output into directory: #{opts[:dir] || "./"}")
       end
     else
-      Owl.IO.puts([:red, "Error: --from option is required"])
+      IO.puts("Error: --from option is required")
       help()
     end
   end

@@ -20,10 +20,15 @@ defmodule SpecForgeWebWeb.Router do
     get "/", PageController, :home
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", SpecForgeWebWeb do
-  #   pipe_through :api
-  # end
+  # API routes
+  scope "/api", SpecForgeWebWeb.Api do
+    pipe_through :api
+
+    post "/task", TaskController, :create
+    post "/system", SystemController, :create
+    post "/plan", PlanController, :create
+    get "/status/:id", StatusController, :show
+  end
 
   # Enable Swoosh mailbox preview in development
   if Application.compile_env(:specforge_web, :dev_routes) do

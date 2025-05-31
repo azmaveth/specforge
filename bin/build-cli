@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+# Build script for SpecForge CLI escript
+set -e
+
+echo "Building SpecForge CLI escript..."
+
+# Ensure we're in the right directory
+cd "$(dirname "$0")/.."
+
+# Clean previous builds
+echo "Cleaning previous builds..."
+rm -f spec
+rm -rf _build/prod
+
+# Compile dependencies and project
+echo "Compiling project..."
+MIX_ENV=prod mix deps.get
+MIX_ENV=prod mix compile
+
+# Build escript from CLI app
+echo "Building escript..."
+cd apps/specforge_cli
+MIX_ENV=prod mix escript.build
+cd ../..
+
+# Check if escript was built successfully
+echo "Checking escript build..."
+if [ -f "./spec" ]; then
+    chmod +x ./spec
+    echo "✅ SpecForge CLI built successfully as ./spec"
+    echo ""
+    echo "Test with: ./spec --version"
+else
+    echo "❌ Failed to build escript"
+    exit 1
+fi
