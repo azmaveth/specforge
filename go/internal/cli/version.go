@@ -11,10 +11,10 @@ func newVersionCommand(version, commit, date string) *cobra.Command {
 		Use:   "version",
 		Short: "Print version information",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("spec version %s\n", version)
+			fmt.Fprintf(cmd.OutOrStdout(), "spec version %s\n", version)
 			if verbose {
-				fmt.Printf("commit: %s\n", commit)
-				fmt.Printf("built: %s\n", date)
+				fmt.Fprintf(cmd.OutOrStdout(), "commit: %s\n", commit)
+				fmt.Fprintf(cmd.OutOrStdout(), "built: %s\n", date)
 			}
 		},
 	}

@@ -52,6 +52,7 @@ clean: ## Clean build artifacts
 
 release: clean ## Build for multiple platforms
 	@echo "Building releases..."
+	@mkdir -p dist
 	GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)-linux-amd64 cmd/spec/main.go
 	GOOS=linux GOARCH=arm64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)-linux-arm64 cmd/spec/main.go
 	GOOS=darwin GOARCH=amd64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)-darwin-amd64 cmd/spec/main.go
