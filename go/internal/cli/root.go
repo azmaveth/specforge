@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/azmaveth/specforge/pkg/config"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
 	cfgFile string
 	verbose bool
 	quiet   bool
+	cfg     *config.Config
 )
 
 // Execute runs the root command
@@ -54,12 +55,6 @@ For more information, visit: https://github.com/azmaveth/specforge`,
 	cmd.PersistentFlags().BoolVarP(&quiet, "quiet", "q", false, "suppress non-essential output")
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 
-	// Bind flags to viper
-	viper.BindPFlag("model", cmd.PersistentFlags().Lookup("model"))
-	viper.BindPFlag("cache.enabled", cmd.PersistentFlags().Lookup("cache"))
-	viper.BindPFlag("cache.ttl", cmd.PersistentFlags().Lookup("cache-ttl"))
-	viper.BindPFlag("output.dir", cmd.PersistentFlags().Lookup("output-dir"))
-
 	// Add subcommands
 	cmd.AddCommand(newVersionCommand(version, commit, date))
 	cmd.AddCommand(newGenerateCommand())
@@ -74,32 +69,25 @@ For more information, visit: https://github.com/azmaveth/specforge`,
 }
 
 func initConfig() {
-	if cfgFile != "" {
-		viper.SetConfigFile(cfgFile)
-	} else {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return
-		}
-
-		// Search for config in home directory
-		viper.AddConfigPath(home + "/.specforge")
-		viper.SetConfigName("config")
-		viper.SetConfigType("yaml")
+	// Load configuration
+	loadedCfg, err := config.Load(cfgFile)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error loading config: %v\n", err)
+		os.Exit(1)
 	}
 
-	// Read from environment variables
-	viper.SetEnvPrefix("SPECFORGE")
-	viper.AutomaticEnv()
+	// Validate configuration
+	if err := loadedCfg.Validate(); err != nil {
+		fmt.Fprintf(os.Stderr, "Invalid config: %v\n", err)
+		os.Exit(1)
+	}
 
-	// Load .env file if present
-	viper.SetConfigFile(".env")
-	viper.ReadInConfig() // ignore errors for .env
+	cfg = loadedCfg
 
-	// Read config file
-	if err := viper.ReadInConfig(); err == nil {
-		if verbose {
-			fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
-		}
+	if verbose {
+		fmt.Fprintf(os.Stderr, "Config loaded successfully\n")
+		fmt.Fprintf(os.Stderr, "Default model: %s\n", cfg.DefaultModel)
+		fmt.Fprintf(os.Stderr, "Cache backend: %s\n", cfg.Cache.Backend)
+		fmt.Fprintf(os.Stderr, "Output dir: %s\n", cfg.Output.Dir)
 	}
 }
